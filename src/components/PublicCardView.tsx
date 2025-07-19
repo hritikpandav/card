@@ -50,20 +50,30 @@ const PublicCardView = () => {
   const [error, setError] = useState<string | null>(null);
   const [showQRCode, setShowQRCode] = useState(false);
 
+  // Debug information
+  console.log('PublicCardView: Component rendered with slug:', slug);
+  console.log('PublicCardView: Current URL:', window.location.href);
+
   useEffect(() => {
     if (slug) {
+      console.log('PublicCardView: Fetching card with slug:', slug);
       fetchCard();
+    } else {
+      console.log('PublicCardView: No slug provided');
     }
   }, [slug]);
 
   const fetchCard = async () => {
     try {
+      console.log('PublicCardView: Starting fetch for slug:', slug);
       const { data, error } = await supabase
         .from('digital_cards')
         .select('*')
         .eq('slug', slug)
         .eq('is_public', true)
         .single();
+
+      console.log('PublicCardView: Fetch result:', { data, error });
 
       if (error) {
         if (error.code === 'PGRST116') {
@@ -88,12 +98,13 @@ const PublicCardView = () => {
         colors: data.colors as DigitalCard['colors'] || {},
       };
 
+      console.log('PublicCardView: Card data processed:', cardData);
       setCard(cardData);
 
       // Track the view
       await trackCardView(data.id);
     } catch (error) {
-      console.error('Error fetching card:', error);
+      console.error('PublicCardView: Error fetching card:', error);
       setError('Failed to load card');
     } finally {
       setLoading(false);
