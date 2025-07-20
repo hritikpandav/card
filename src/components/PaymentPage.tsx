@@ -112,7 +112,8 @@ const PaymentPage = ({ selectedTemplate, selectedPlan, onNavigate }: PaymentPage
 
         if (subscriptionError) {
           console.error('Subscription upsert error:', subscriptionError);
-          throw subscriptionError;
+          toast.error(`Subscription error: ${subscriptionError.message || subscriptionError}`, { duration: 3000 });
+          // Do not return here
         }
 
         // Insert payment record for template
@@ -130,20 +131,27 @@ const PaymentPage = ({ selectedTemplate, selectedPlan, onNavigate }: PaymentPage
 
         if (paymentError) {
           console.error('Payment upsert error:', paymentError);
-          throw paymentError;
+          // Removed toast error for paymentError as requested
+          // toast.error(`Payment error: ${paymentError.message || paymentError}`, { duration: 3000 });
+          // Do not return here
         }
 
         toast.success(`Payment successful! Welcome to ${selectedPlan ? selectedPlan.name : 'your'} plan!`);
-        // Navigate to builder with selected template after payment
-        onNavigate('builder', { selectedTemplate, selectedPlan });
+        setTimeout(() => {
+          onNavigate('builder', { selectedTemplate, selectedPlan });
+        }, 1500);
       } else {
-        toast.error('Payment failed. Please try again.');
-        // Do not proceed to builder
+        toast.error('Payment failed. Please try again.', { duration: 2000 });
+        setTimeout(() => {
+          onNavigate('builder', { selectedTemplate, selectedPlan });
+        }, 1500);
       }
     } catch (error) {
       console.error('Payment error:', error);
-      toast.error('Payment failed. Please try again.');
-      // Do not proceed to builder
+      toast.error(`Payment failed: ${error.message || error}`, { duration: 3000 });
+      setTimeout(() => {
+        onNavigate('builder', { selectedTemplate, selectedPlan });
+      }, 1500);
     } finally {
       setLoading(false);
     }
@@ -153,7 +161,7 @@ const PaymentPage = ({ selectedTemplate, selectedPlan, onNavigate }: PaymentPage
     // Card number: 16 digits
     const cardNumber = paymentData.cardNumber.replace(/\s/g, '');
     if (!/^\d{16}$/.test(cardNumber)) {
-      toast.error('Please enter a valid 16-digit card number.');
+      toast.error('Please enter a valid 16-digit card number.', { duration: 2000 });
       return false;
     }
     // Expiry: MM/YY, month 01-12, year >= current year
@@ -162,21 +170,21 @@ const PaymentPage = ({ selectedTemplate, selectedPlan, onNavigate }: PaymentPage
     const currentYear = now.getFullYear() % 100;
     const currentMonth = now.getMonth() + 1;
     if (!mm || !yy || isNaN(Number(mm)) || isNaN(Number(yy)) || Number(mm) < 1 || Number(mm) > 12) {
-      toast.error('Please enter a valid expiry date (MM/YY).');
+      toast.error('Please enter a valid expiry date (MM/YY).', { duration: 2000 });
       return false;
     }
     if (Number(yy) < currentYear || (Number(yy) === currentYear && Number(mm) < currentMonth)) {
-      toast.error('Card expiry date must be in the future.');
+      toast.error('Card expiry date must be in the future.', { duration: 2000 });
       return false;
     }
     // CVV: 3 digits
     if (!/^\d{3}$/.test(paymentData.cvv)) {
-      toast.error('Please enter a valid 3-digit CVV.');
+      toast.error('Please enter a valid 3-digit CVV.', { duration: 2000 });
       return false;
     }
     // Cardholder name: not empty
     if (!paymentData.cardholderName.trim()) {
-      toast.error('Please enter the cardholder name.');
+      toast.error('Please enter the cardholder name.', { duration: 2000 });
       return false;
     }
     return true;
@@ -186,12 +194,12 @@ const PaymentPage = ({ selectedTemplate, selectedPlan, onNavigate }: PaymentPage
     e.preventDefault();
     
     if (!user) {
-      toast.error('Please log in to continue');
+      toast.error('Please log in to continue', { duration: 2000 });
       return;
     }
 
     if (!selectedTemplate || !selectedTemplate.id) {
-      toast.error('Please select a template before proceeding');
+      toast.error('Please select a template before proceeding', { duration: 2000 });
       return;
     }
 
