@@ -1,4 +1,4 @@
- 
+
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,6 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
-import QRCodeGenerator from "@/components/QRCodeGenerator";
 
 interface DigitalCard {
   id: string;
@@ -35,8 +34,6 @@ const Dashboard = ({ onNavigate }: { onNavigate: (section: string) => void }) =>
   const [cards, setCards] = useState<DigitalCard[]>([]);
   const [cardStats, setCardStats] = useState<CardStats>({ totalViews: 0, totalScans: 0 });
   const [loading, setLoading] = useState(true);
-  const [showQRCode, setShowQRCode] = useState(false);
-  const [selectedCard, setSelectedCard] = useState<DigitalCard | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -166,8 +163,7 @@ const Dashboard = ({ onNavigate }: { onNavigate: (section: string) => void }) =>
 
   const handleGenerateQR = (card: DigitalCard) => {
     if (card.slug) {
-      setSelectedCard(card);
-      setShowQRCode(true);
+      toast.success('QR code feature coming soon!');
     } else {
       toast.error('Card slug not available');
     }
@@ -391,7 +387,7 @@ const Dashboard = ({ onNavigate }: { onNavigate: (section: string) => void }) =>
                       <div className="text-xs text-slate-600">Views</div>
                     </div>
                     <div>
-                      <div className="text-lg font-bold text-slate-900">{card.scans || 0}</div>
+                      <div className="text-lg font-bold text-slate-900">0</div>
                       <div className="text-xs text-slate-600">Scans</div>
                     </div>
                   </div>
@@ -451,14 +447,6 @@ const Dashboard = ({ onNavigate }: { onNavigate: (section: string) => void }) =>
               </Card>
             ))}
           </div>
-        )}
-        {/* QR Code Modal */}
-        {showQRCode && selectedCard && (
-          <QRCodeGenerator
-            cardData={selectedCard}
-            cardUrl={`${window.location.origin}/card/${selectedCard.slug}`}
-            onClose={() => setShowQRCode(false)}
-          />
         )}
       </div>
     </div>
