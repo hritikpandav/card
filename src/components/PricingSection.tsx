@@ -258,67 +258,69 @@ const PricingSection = ({ selectedTemplate, onPlanSelect }: PricingSectionProps)
           {plans.map((plan, index) => {
             const isCurrentPlan = currentPlanId === plan.id;
             const isPopular = plan.duration_months === 3;
-            
+            // Add highlight for selected/hovered plan
             return (
-              <Card 
-                key={plan.id} 
-                className={`relative border-0 shadow-lg hover:shadow-2xl transition-all duration-300 group ${
-                  isPopular ? 'ring-2 ring-blue-500 scale-105' : ''
-                } ${isCurrentPlan ? 'ring-2 ring-green-500' : ''} bg-white/80 backdrop-blur-sm`}
-              >
-                {isPopular && (
-                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                    <Badge className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white border-0 px-4 py-1">
-                      Most Popular
-                    </Badge>
-                  </div>
-                )}
+              <div className={`relative group transition-all duration-300 ${isCurrentPlan ? 'z-10' : ''}`} key={plan.id}>
+                <Card 
+                  className={`relative border-0 shadow-lg hover:shadow-2xl transition-all duration-300 group bg-white/80 backdrop-blur-sm
+                    ${isPopular ? 'scale-105' : ''}
+                    ${isCurrentPlan ? 'ring-4 ring-offset-2 ring-transparent bg-clip-padding before:content-[\'\'] before:absolute before:inset-0 before:rounded-2xl before:z-[-1] before:bg-[conic-gradient(at_top_left,_#6366f1,_#06b6d4,_#f59e42,_#f43f5e,_#6366f1)] before:animate-spin-slow before:opacity-80' :
+                      'hover:ring-2 hover:ring-blue-400'}
+                  `}
+                  style={isCurrentPlan ? { boxShadow: '0 0 0 4px #fff, 0 0 0 8px #6366f1' } : {}}
+                >
+                  {isPopular && (
+                    <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                      <Badge className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white border-0 px-4 py-1">
+                        Most Popular
+                      </Badge>
+                    </div>
+                  )}
 
-                {isCurrentPlan && (
-                  <div className="absolute -top-3 right-4">
-                    <Badge className="bg-gradient-to-r from-green-500 to-emerald-500 text-white border-0 px-3 py-1">
-                      Current Plan
-                    </Badge>
-                  </div>
-                )}
-                
-                <CardHeader className="text-center pb-4">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 flex items-center justify-center text-white mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-                    <Zap className="h-6 w-6" />
-                  </div>
-                  <CardTitle className="text-xl font-bold text-slate-900">{plan.name}</CardTitle>
-                  <div className="text-center">
-                    <span className="text-3xl font-bold text-slate-900">{formatPrice(plan.price_cents)}</span>
-                    <span className="text-slate-600">/{plan.duration_months === 1 ? 'month' : `${plan.duration_months} months`}</span>
-                  </div>
-                  <p className="text-sm text-slate-600">
-                    {plan.duration_months >= 12 ? 'Best value for professionals' : 
-                     plan.duration_months >= 6 ? 'Great for growing businesses' :
-                     plan.duration_months >= 3 ? 'Perfect for small teams' : 'Ideal for individuals'}
-                  </p>
-                </CardHeader>
-                
-                <CardContent className="space-y-6">
-                  <ul className="space-y-3">
-                    {getPlanFeatures(plan.duration_months).map((feature, featureIndex) => (
-                      <li key={featureIndex} className="flex items-start space-x-3">
-                        <Check className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                        <span className="text-sm text-slate-700">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  
-                  <Button 
-                    onClick={() => handlePlanSelect(plan)}
-                    disabled={isCurrentPlan}
-                    className={`w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:opacity-90 text-white font-medium py-2.5 rounded-lg transition-all duration-300 ${
-                      isPopular ? 'shadow-lg hover:shadow-xl' : ''
-                    } ${isCurrentPlan ? 'opacity-50 cursor-not-allowed' : ''}`}
-                  >
-                    {isCurrentPlan ? 'Current Plan' : `Upgrade to ${plan.name}`}
-                  </Button>
-                </CardContent>
-              </Card>
+                  {isCurrentPlan && (
+                    <div className="absolute -top-3 right-4">
+                      <Badge className="bg-gradient-to-r from-green-500 to-emerald-500 text-white border-0 px-3 py-1">
+                        Current Plan
+                      </Badge>
+                    </div>
+                  )}
+                  {/* ... existing CardHeader and CardContent ... */}
+                  <CardHeader className="text-center pb-4">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 flex items-center justify-center text-white mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                      <Zap className="h-6 w-6" />
+                    </div>
+                    <CardTitle className="text-xl font-bold text-slate-900">{plan.name}</CardTitle>
+                    <div className="text-center">
+                      <span className="text-3xl font-bold text-slate-900">{formatPrice(plan.price_cents)}</span>
+                      <span className="text-slate-600">/{plan.duration_months === 1 ? 'month' : `${plan.duration_months} months`}</span>
+                    </div>
+                    <p className="text-sm text-slate-600">
+                      {plan.duration_months >= 12 ? 'Best value for professionals' : 
+                        plan.duration_months >= 6 ? 'Great for growing businesses' :
+                        plan.duration_months >= 3 ? 'Perfect for small teams' : 'Ideal for individuals'}
+                    </p>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <ul className="space-y-3">
+                      {getPlanFeatures(plan.duration_months).map((feature, featureIndex) => (
+                        <li key={featureIndex} className="flex items-start space-x-3">
+                          <Check className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                          <span className="text-sm text-slate-700">{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <Button 
+                      onClick={() => handlePlanSelect(plan)}
+                      disabled={isCurrentPlan}
+                      className={`w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:opacity-90 text-white font-medium py-2.5 rounded-lg transition-all duration-300 ${
+                        isPopular ? 'shadow-lg hover:shadow-xl' : ''
+                      } ${isCurrentPlan ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    >
+                      {isCurrentPlan ? 'Current Plan' : `Upgrade to ${plan.name}`}
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
             );
           })}
         </div>

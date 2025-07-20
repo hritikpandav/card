@@ -22,18 +22,19 @@ interface DigitalCard {
   title?: string;
   company?: string;
   views?: number;
+  // scans?: number; // Remove scans
 }
 
 interface CardStats {
   totalViews: number;
-  totalScans: number;
+  // totalScans: number; // Remove totalScans
 }
 
 const Dashboard = ({ onNavigate }: { onNavigate: (section: string) => void }) => {
   const { user } = useAuth();
   const { subscription, getSubscriptionStatus } = useSubscription();
   const [cards, setCards] = useState<DigitalCard[]>([]);
-  const [cardStats, setCardStats] = useState<CardStats>({ totalViews: 0, totalScans: 0 });
+  const [cardStats, setCardStats] = useState<CardStats>({ totalViews: 0 }); // Remove totalScans
   const [loading, setLoading] = useState(true);
   const [showQRCode, setShowQRCode] = useState(false);
   const [selectedCard, setSelectedCard] = useState<DigitalCard | null>(null);
@@ -61,7 +62,6 @@ const Dashboard = ({ onNavigate }: { onNavigate: (section: string) => void }) =>
         (data || []).map(async (card) => {
           const { data: viewCount } = await supabase
             .rpc('get_card_view_count', { card_uuid: card.id });
-          
           return {
             ...card,
             views: viewCount || 0
@@ -73,7 +73,7 @@ const Dashboard = ({ onNavigate }: { onNavigate: (section: string) => void }) =>
 
       // Calculate total stats
       const totalViews = cardsWithViews.reduce((sum, card) => sum + (card.views || 0), 0);
-      setCardStats({ totalViews, totalScans: 0 });
+      setCardStats({ totalViews }); // Remove totalScans
     } catch (error) {
       console.error('Error fetching cards:', error);
       toast.error('Failed to load your cards');
@@ -262,59 +262,39 @@ const Dashboard = ({ onNavigate }: { onNavigate: (section: string) => void }) =>
         )}
 
         {/* Stats Overview */}
-        <div className="grid md:grid-cols-4 gap-6 mb-8">
-          <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-slate-600 mb-1">Total Cards</p>
-                  <p className="text-2xl font-bold text-slate-900">{cards.length}</p>
-                </div>
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center text-white">
-                  <BarChart3 className="h-5 w-5" />
-                </div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
+          <Card className="border-0 bg-gradient-to-br from-blue-100 to-indigo-100 shadow-[0_2px_12px_0_rgba(59,130,246,0.13),0_1px_4px_0_rgba(139,92,246,0.10),0_0.5px_2px_0_rgba(16,185,129,0.08)] hover:scale-[1.03] hover:shadow-[0_4px_24px_0_rgba(59,130,246,0.18),0_2px_8px_0_rgba(139,92,246,0.15),0_1px_4px_0_rgba(16,185,129,0.12)] transition-all duration-200 rounded-2xl border-2 border-transparent hover:border-blue-300 min-h-[90px]">
+            <CardContent className="p-4 flex flex-row items-center justify-between h-full">
+              <div>
+                <p className="text-xs text-slate-600 mb-0.5 font-bold">Total Cards</p>
+                <p className="text-2xl font-extrabold text-slate-900 leading-tight">{cards.length}</p>
+              </div>
+              <div className="w-11 h-11 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center text-white shadow-md border-2 border-white">
+                <BarChart3 className="h-5 w-5" />
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-slate-600 mb-1">Live Cards</p>
-                  <p className="text-2xl font-bold text-slate-900">{liveCards}</p>
-                </div>
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center text-white">
-                  <Globe className="h-5 w-5" />
-                </div>
+          <Card className="border-0 bg-gradient-to-br from-green-100 to-emerald-100 shadow-[0_2px_12px_0_rgba(16,185,129,0.13),0_1px_4px_0_rgba(52,211,153,0.10),0_0.5px_2px_0_rgba(59,130,246,0.08)] hover:scale-[1.03] hover:shadow-[0_4px_24px_0_rgba(16,185,129,0.18),0_2px_8px_0_rgba(52,211,153,0.15),0_1px_4px_0_rgba(59,130,246,0.12)] transition-all duration-200 rounded-2xl border-2 border-transparent hover:border-green-300 min-h-[90px]">
+            <CardContent className="p-4 flex flex-row items-center justify-between h-full">
+              <div>
+                <p className="text-xs text-slate-600 mb-0.5 font-bold">Live Cards</p>
+                <p className="text-2xl font-extrabold text-slate-900 leading-tight">{liveCards}</p>
+              </div>
+              <div className="w-11 h-11 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center text-white shadow-md border-2 border-white">
+                <Globe className="h-5 w-5" />
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-slate-600 mb-1">Total Views</p>
-                  <p className="text-2xl font-bold text-slate-900">{cardStats.totalViews}</p>
-                </div>
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center text-white">
-                  <Eye className="h-5 w-5" />
-                </div>
+          <Card className="border-0 bg-gradient-to-br from-purple-100 to-pink-100 shadow-[0_2px_12px_0_rgba(168,85,247,0.13),0_1px_4px_0_rgba(236,72,153,0.10),0_0.5px_2px_0_rgba(59,130,246,0.08)] hover:scale-[1.03] hover:shadow-[0_4px_24px_0_rgba(168,85,247,0.18),0_2px_8px_0_rgba(236,72,153,0.15),0_1px_4px_0_rgba(59,130,246,0.12)] transition-all duration-200 rounded-2xl border-2 border-transparent hover:border-pink-300 min-h-[90px]">
+            <CardContent className="p-4 flex flex-row items-center justify-between h-full">
+              <div>
+                <p className="text-xs text-slate-600 mb-0.5 font-bold">Total Views</p>
+                <p className="text-2xl font-extrabold text-slate-900 leading-tight">{cardStats.totalViews}</p>
               </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-slate-600 mb-1">QR Scans</p>
-                  <p className="text-2xl font-bold text-slate-900">{cardStats.totalScans}</p>
-                </div>
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-orange-500 to-red-500 flex items-center justify-center text-white">
-                  <QrCode className="h-5 w-5" />
-                </div>
+              <div className="w-11 h-11 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center text-white shadow-md border-2 border-white">
+                <Eye className="h-5 w-5" />
               </div>
             </CardContent>
           </Card>
@@ -330,36 +310,36 @@ const Dashboard = ({ onNavigate }: { onNavigate: (section: string) => void }) =>
             <p className="text-slate-600 mb-6">Create your first digital business card to get started.</p>
             <Button 
               onClick={() => onNavigate("templates")}
-              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white"
+              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg"
             >
               <Plus className="h-4 w-4 mr-2" />
               Create Your First Card
             </Button>
           </div>
         ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {cards.map((card) => (
-              <Card key={card.id} className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-white/80 backdrop-blur-sm">
-                <CardHeader className="pb-3">
+              <Card key={card.id} className="border-0 bg-white/90 backdrop-blur-xl rounded-2xl p-2 shadow-[0_4px_24px_0_rgba(59,130,246,0.13),0_1.5px_8px_0_rgba(236,72,153,0.10),0_0.5px_2px_0_rgba(16,185,129,0.10)] hover:scale-[1.02] hover:shadow-[0_8px_32px_0_rgba(59,130,246,0.18),0_3px_16px_0_rgba(236,72,153,0.15),0_1px_4px_0_rgba(16,185,129,0.15)] transition-all duration-300">
+                <CardHeader className="pb-2 px-3 pt-3">
                   <div className="flex items-start justify-between">
                     <div>
-                      <CardTitle className="text-lg text-slate-900 mb-1">{card.name}</CardTitle>
-                      <p className="text-sm text-slate-600">
+                      <CardTitle className="text-base text-slate-900 mb-1 font-bold truncate max-w-[140px]">{card.name}</CardTitle>
+                      <p className="text-xs text-slate-600 truncate max-w-[140px]">
                         {card.title && card.company ? `${card.title} at ${card.company}` : 'Professional Template'}
                       </p>
                     </div>
                     <div className="flex items-center space-x-2">
                       <Badge 
                         className={card.is_public 
-                          ? "bg-green-100 text-green-700 border-green-200" 
-                          : "bg-slate-100 text-slate-700 border-slate-200"
+                          ? "bg-green-100 text-green-700 border-green-200 px-2 py-0.5 text-[11px]" 
+                          : "bg-slate-100 text-slate-700 border-slate-200 px-2 py-0.5 text-[11px]"
                         }
                       >
                         {card.is_public ? "Live" : "Draft"}
                       </Badge>
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
-                          <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700 hover:bg-red-50">
+                          <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700 hover:bg-red-50 p-1">
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </AlertDialogTrigger>
@@ -384,23 +364,16 @@ const Dashboard = ({ onNavigate }: { onNavigate: (section: string) => void }) =>
                     </div>
                   </div>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4 text-center">
-                    <div>
-                      <div className="text-lg font-bold text-slate-900">{card.views || 0}</div>
-                      <div className="text-xs text-slate-600">Views</div>
-                    </div>
-                    <div>
-                      <div className="text-lg font-bold text-slate-900">{card.scans || 0}</div>
-                      <div className="text-xs text-slate-600">Scans</div>
-                    </div>
+                <CardContent className="space-y-2 px-3 pb-3 pt-0">
+                  <div className="flex flex-col items-center justify-center gap-0.5 py-1">
+                    <div className="text-lg font-bold text-slate-900">{card.views || 0}</div>
+                    <div className="text-xs text-slate-600">Views</div>
                   </div>
-                  
-                  <div className="flex space-x-2">
+                  <div className="flex flex-row gap-1 mt-1">
                     <Button 
                       variant="outline" 
                       size="sm" 
-                      className="flex-1"
+                      className="flex-1 font-medium px-1 py-1 text-xs"
                       onClick={() => onNavigate("builder")}
                     >
                       <Edit className="h-4 w-4 mr-1" />
@@ -409,6 +382,7 @@ const Dashboard = ({ onNavigate }: { onNavigate: (section: string) => void }) =>
                     <Button 
                       variant="outline" 
                       size="sm" 
+                      className="flex-1 font-medium px-1 py-1 text-xs"
                       onClick={() => handleGenerateQR(card)}
                     >
                       <QrCode className="h-4 w-4" />
@@ -416,6 +390,7 @@ const Dashboard = ({ onNavigate }: { onNavigate: (section: string) => void }) =>
                     <Button 
                       variant="outline" 
                       size="sm"
+                      className="flex-1 font-medium px-1 py-1 text-xs"
                       onClick={() => handleShareCard(card)}
                     >
                       <Share2 className="h-4 w-4" />
@@ -424,27 +399,14 @@ const Dashboard = ({ onNavigate }: { onNavigate: (section: string) => void }) =>
                       <Button
                         variant="outline"
                         size="sm"
+                        className="flex-1 font-medium px-1 py-1 text-xs"
                         onClick={() => window.open(`/card/${card.slug}`, '_blank', 'noopener,noreferrer')}
                       >
                         View
                       </Button>
                     )}
                   </div>
-
-                  <Button 
-                    onClick={() => toggleCardLive(card.id)}
-                    className={`w-full ${
-                      card.is_public 
-                        ? "bg-red-500 hover:bg-red-600 text-white" 
-                        : "bg-green-500 hover:bg-green-600 text-white"
-                    }`}
-                    size="sm"
-                  >
-                    <Globe className="h-4 w-4 mr-2" />
-                    {card.is_public ? "Take Offline" : "Make Live"}
-                  </Button>
-                  
-                  <p className="text-xs text-slate-500 text-center">
+                  <p className="text-[11px] text-slate-500 text-center mt-1">
                     Updated {new Date(card.updated_at).toLocaleDateString()}
                   </p>
                 </CardContent>
