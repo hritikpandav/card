@@ -407,6 +407,18 @@ const Dashboard = ({ onNavigate }: { onNavigate: (section: string) => void }) =>
                     >
                       <Share2 className="h-4 w-4" />
                     </Button>
+                    <Button 
+                      onClick={() => toggleCardLive(card.id)}
+                      className={`flex-1 font-medium px-1 py-1 text-base rounded-xl transition-all duration-200 hover:bg-blue-100/60 hover:border-blue-400 ${
+                        card.is_public 
+                          ? "bg-red-500 hover:bg-red-600 text-white" 
+                          : "bg-green-500 hover:bg-green-600 text-white"
+                      }`}
+                      size="sm"
+                    >
+                      <Globe className="h-4 w-4 mr-2" />
+                      {card.is_public ? "Take Offline" : "Make Live"}
+                    </Button>    
                     {card.is_public && (
                       <Button
                         variant="outline"
