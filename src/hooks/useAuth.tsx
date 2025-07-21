@@ -75,10 +75,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     console.log('Attempting sign up for:', email);
     setLoading(true);
     
-    // Remove emailRedirectTo and email verification
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
+      // Remove emailRedirectTo to disable email verification and auto sign-in
     });
 
     if (error) {
@@ -93,12 +93,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       } else {
         toast.error(error.message);
       }
-    } else {
-      toast.success('Account created successfully! You are now signed in.');
+      setLoading(false);
+      return { error };
     }
 
+    // Automatically sign in the user after successful sign-up
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (signInError) {
+      console.error('Sign in after sign up error:', signInError);
+      toast.error('Error signing in after sign up.');
+      setLoading(false);
+      return { error: signInError };
+    }
+
+    toast.success('Account created and signed in successfully!');
     setLoading(false);
-    return { error };
+    return { error: null };
   };
 
   const signOut = async () => {
