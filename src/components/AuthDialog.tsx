@@ -79,9 +79,9 @@ const AuthDialog = ({ isOpen, onClose, defaultTab = "signin" }: AuthDialogProps)
         error.message?.toLowerCase().includes('invalid email or password') ||
         error.status === 400
       ) {
-        setEmailExists(true); // Email is registered
-      } else {
         setEmailExists(false); // Email is not registered
+      } else {
+        setEmailExists(true); // Email is registered
       }
     } else {
       setEmailExists(true); // Should not happen, but treat as exists

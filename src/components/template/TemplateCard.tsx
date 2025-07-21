@@ -11,26 +11,25 @@ interface TemplateCardProps {
   isFavorite: boolean;
   onTemplateSelect: (template: Template) => void;
   onToggleFavorite: (templateId: string) => void;
+  onViewTemplate: (template: Template) => void;
 }
 
-const TemplateCard = ({ template, isFavorite, onTemplateSelect, onToggleFavorite }: TemplateCardProps) => {
+const TemplateCard = ({ template, isFavorite, onTemplateSelect, onToggleFavorite, onViewTemplate }: TemplateCardProps) => {
   return (
     <Card className="group cursor-pointer border-0 shadow-lg hover:shadow-2xl transition-all duration-300 bg-white/80 backdrop-blur-sm overflow-hidden">
       <CardContent className="p-0">
         {/* Template Preview */}
         <div className="relative">
           <TemplatePreview template={template} />
-          
           {/* Overlay */}
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300 flex items-center justify-center">
             <Button
-              onClick={() => onTemplateSelect(template)}
+              onClick={e => { e.stopPropagation(); onViewTemplate(template); }}
               className="opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300 bg-white text-slate-900 hover:bg-slate-100 shadow-lg"
             >
-              Use This Template
+              View Template
             </Button>
           </div>
-
           {/* Premium Badge */}
           {template.isPremium && (
             <div className="absolute top-3 left-3">
@@ -40,7 +39,6 @@ const TemplateCard = ({ template, isFavorite, onTemplateSelect, onToggleFavorite
               </Badge>
             </div>
           )}
-
           {/* Favorite Button */}
           <button
             onClick={(e) => {
@@ -58,7 +56,6 @@ const TemplateCard = ({ template, isFavorite, onTemplateSelect, onToggleFavorite
             />
           </button>
         </div>
-
         {/* Template Info */}
         <div className="p-6">
           <div className="flex items-center justify-between mb-3">
@@ -68,7 +65,6 @@ const TemplateCard = ({ template, isFavorite, onTemplateSelect, onToggleFavorite
               <span>{template.rating}</span>
             </div>
           </div>
-          
           <div className="flex items-center justify-between mb-4">
             <Badge variant="secondary" className="capitalize text-xs">
               {template.category}
@@ -78,7 +74,6 @@ const TemplateCard = ({ template, isFavorite, onTemplateSelect, onToggleFavorite
               <span>{template.views.toLocaleString()}</span>
             </div>
           </div>
-
           {/* Color Palette */}
           <div className="flex items-center space-x-2 mb-4">
             <span className="text-xs text-slate-500">Colors:</span>
@@ -92,7 +87,6 @@ const TemplateCard = ({ template, isFavorite, onTemplateSelect, onToggleFavorite
               ))}
             </div>
           </div>
-
           <Button 
             onClick={() => onTemplateSelect(template)}
             className="w-full bg-gradient-to-r from-slate-700 to-slate-800 hover:from-slate-800 hover:to-slate-900 text-white"

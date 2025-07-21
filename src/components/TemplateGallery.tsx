@@ -4,10 +4,12 @@ import { Template, TemplateGalleryProps } from "@/types/template";
 import { templates } from "@/data/templates";
 import CategoryFilter from "@/components/template/CategoryFilter";
 import TemplateCard from "@/components/template/TemplateCard";
+import TemplatePreview from "@/components/template/TemplatePreview";
 
 const TemplateGallery = ({ onTemplateSelect, onNavigate }: TemplateGalleryProps) => {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [favorites, setFavorites] = useState<string[]>([]);
+  const [previewTemplate, setPreviewTemplate] = useState<Template | null>(null);
 
   const filteredTemplates = selectedCategory === "all" 
     ? templates 
@@ -50,10 +52,29 @@ const TemplateGallery = ({ onTemplateSelect, onNavigate }: TemplateGalleryProps)
               isFavorite={favorites.includes(template.id)}
               onTemplateSelect={onTemplateSelect}
               onToggleFavorite={toggleFavorite}
+              onViewTemplate={setPreviewTemplate}
             />
           ))}
         </div>
       </div>
+      {/* Modal for full template preview */}
+      {previewTemplate && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 relative animate-fade-in">
+            <button
+              className="absolute top-3 right-3 text-slate-500 hover:text-slate-900 text-xl font-bold"
+              onClick={() => setPreviewTemplate(null)}
+              aria-label="Close preview"
+            >
+              ×
+            </button>
+            <div className="mb-4 text-center text-lg font-semibold text-slate-900">
+              {previewTemplate.name} Preview
+            </div>
+            <TemplatePreview template={previewTemplate} />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

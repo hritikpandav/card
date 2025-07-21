@@ -317,29 +317,41 @@ const Dashboard = ({ onNavigate }: { onNavigate: (section: string) => void }) =>
             </Button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {cards.map((card) => (
-              <Card key={card.id} className="border-0 bg-white/90 backdrop-blur-xl rounded-2xl p-2 shadow-[0_4px_24px_0_rgba(59,130,246,0.13),0_1.5px_8px_0_rgba(236,72,153,0.10),0_0.5px_2px_0_rgba(16,185,129,0.10)] hover:scale-[1.02] hover:shadow-[0_8px_32px_0_rgba(59,130,246,0.18),0_3px_16px_0_rgba(236,72,153,0.15),0_1px_4px_0_rgba(16,185,129,0.15)] transition-all duration-300">
+          <div
+            key={cards.length}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 transition-all duration-500"
+            style={{
+              animation: 'slideIn 0.5s cubic-bezier(0.4,0,0.2,1)'
+            }}
+          >
+            {cards.map((card, idx) => (
+              <div
+                key={card.id}
+                className="transition-transform duration-500 ease-in-out will-change-transform"
+                style={{
+                  animation: `slideCardIn 0.5s ${idx * 60}ms cubic-bezier(0.4,0,0.2,1)`
+                }}
+              >
+                <Card className="border-2 border-slate-400 bg-white/95 backdrop-blur-xl rounded-3xl p-3 shadow-[0_2px_12px_0_rgba(59,130,246,0.10),0_1px_4px_0_rgba(236,72,153,0.08)] hover:shadow-[0_8px_32px_0_rgba(59,130,246,0.15),0_3px_16px_0_rgba(236,72,153,0.12)] hover:bg-blue-50/40 transition-all duration-300 ease-in-out">
                 <CardHeader className="pb-2 px-3 pt-3">
                   <div className="flex items-start justify-between">
                     <div>
-                      <CardTitle className="text-base text-slate-900 mb-1 font-bold truncate max-w-[140px]">{card.name}</CardTitle>
-                      <p className="text-xs text-slate-600 truncate max-w-[140px]">
-                        {card.title && card.company ? `${card.title} at ${card.company}` : 'Professional Template'}
-                      </p>
+                      <CardTitle className="text-xl text-slate-900 mb-1 font-bold truncate max-w-[180px]">{card.name}</CardTitle>
+                      {card.title && <div className="text-lg text-slate-700 font-medium">{card.title}</div>}
+                      {card.company && <div className="text-base text-slate-500 italic">{card.company}</div>}
                     </div>
                     <div className="flex items-center space-x-2">
                       <Badge 
                         className={card.is_public 
-                          ? "bg-green-100 text-green-700 border-green-200 px-2 py-0.5 text-[11px]" 
-                          : "bg-slate-100 text-slate-700 border-slate-200 px-2 py-0.5 text-[11px]"
+                          ? "bg-green-100 text-green-700 border-green-200 px-2 py-0.5 text-[13px]" 
+                          : "bg-slate-100 text-slate-700 border-slate-200 px-2 py-0.5 text-[13px]"
                         }
                       >
                         {card.is_public ? "Live" : "Draft"}
                       </Badge>
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
-                          <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700 hover:bg-red-50 p-1">
+                          <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700 hover:bg-red-50 p-1 transition-all duration-200 rounded-full">
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </AlertDialogTrigger>
@@ -366,14 +378,14 @@ const Dashboard = ({ onNavigate }: { onNavigate: (section: string) => void }) =>
                 </CardHeader>
                 <CardContent className="space-y-2 px-3 pb-3 pt-0">
                   <div className="flex flex-col items-center justify-center gap-0.5 py-1">
-                    <div className="text-lg font-bold text-slate-900">{card.views || 0}</div>
-                    <div className="text-xs text-slate-600">Views</div>
+                    <div className="text-2xl font-bold text-slate-900">{card.views || 0}</div>
+                    <div className="text-base text-slate-600">Views</div>
                   </div>
-                  <div className="flex flex-row gap-1 mt-1">
+                  <div className="flex flex-row gap-2 mt-2">
                     <Button 
                       variant="outline" 
                       size="sm" 
-                      className="flex-1 font-medium px-1 py-1 text-xs"
+                      className="flex-1 font-medium px-1 py-1 text-base rounded-xl transition-all duration-200 hover:bg-blue-100/60 hover:border-blue-400"
                       onClick={() => onNavigate("builder")}
                     >
                       <Edit className="h-4 w-4 mr-1" />
@@ -382,7 +394,7 @@ const Dashboard = ({ onNavigate }: { onNavigate: (section: string) => void }) =>
                     <Button 
                       variant="outline" 
                       size="sm" 
-                      className="flex-1 font-medium px-1 py-1 text-xs"
+                      className="flex-1 font-medium px-1 py-1 text-base rounded-xl transition-all duration-200 hover:bg-blue-100/60 hover:border-blue-400"
                       onClick={() => handleGenerateQR(card)}
                     >
                       <QrCode className="h-4 w-4" />
@@ -390,7 +402,7 @@ const Dashboard = ({ onNavigate }: { onNavigate: (section: string) => void }) =>
                     <Button 
                       variant="outline" 
                       size="sm"
-                      className="flex-1 font-medium px-1 py-1 text-xs"
+                      className="flex-1 font-medium px-1 py-1 text-base rounded-xl transition-all duration-200 hover:bg-blue-100/60 hover:border-blue-400"
                       onClick={() => handleShareCard(card)}
                     >
                       <Share2 className="h-4 w-4" />
@@ -399,18 +411,19 @@ const Dashboard = ({ onNavigate }: { onNavigate: (section: string) => void }) =>
                       <Button
                         variant="outline"
                         size="sm"
-                        className="flex-1 font-medium px-1 py-1 text-xs"
+                        className="flex-1 font-medium px-1 py-1 text-base rounded-xl transition-all duration-200 hover:bg-blue-100/60 hover:border-blue-400"
                         onClick={() => window.open(`/card/${card.slug}`, '_blank', 'noopener,noreferrer')}
                       >
                         View
                       </Button>
                     )}
                   </div>
-                  <p className="text-[11px] text-slate-500 text-center mt-1">
+                  <p className="text-[13px] text-slate-500 text-center mt-1">
                     Updated {new Date(card.updated_at).toLocaleDateString()}
                   </p>
                 </CardContent>
               </Card>
+              </div>
             ))}
           </div>
         )}
