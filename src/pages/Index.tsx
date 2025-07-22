@@ -17,6 +17,7 @@ const Index = () => {
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<any>(null);
   const [selectedPlan, setSelectedPlan] = useState<any>(null);
+  const [selectedCard, setSelectedCard] = useState<any>(null);
   const { user } = useAuth();
   const { getSubscriptionStatus, loading: subscriptionLoading } = useSubscription();
 
@@ -24,7 +25,7 @@ const Index = () => {
     console.log('Current section:', currentSection, 'User:', user?.email);
   }, [user, currentSection]);
 
-  const handleNavigate = (section: string, data?: { selectedTemplate?: any; selectedPlan?: any }) => {
+  const handleNavigate = (section: string, data?: { selectedTemplate?: any; selectedPlan?: any; selectedCard?: any }) => {
     console.log('Navigating to:', section, 'with data:', data);
     if ((section === "dashboard" || section === "templates" || section === "builder" || section === "payment") && !user) {
       setShowAuthDialog(true);
@@ -37,6 +38,10 @@ const Index = () => {
     if (data?.selectedPlan) {
       console.log('Setting selectedPlan:', data.selectedPlan);
       setSelectedPlan(data.selectedPlan);
+    }
+    if (data?.selectedCard) {
+      console.log('Setting selectedCard:', data.selectedCard);
+      setSelectedCard(data.selectedCard);
     }
     console.log('Setting currentSection to:', section);
     setCurrentSection(section);
@@ -118,7 +123,7 @@ const Index = () => {
           onNavigate={handleNavigate} 
         />;
       case "builder":
-        return <CardBuilder selectedTemplate={selectedTemplate} selectedPlan={selectedPlan} onNavigate={handleNavigate} />;
+        return <CardBuilder selectedTemplate={selectedTemplate} selectedPlan={selectedPlan} selectedCard={selectedCard} onNavigate={handleNavigate} />;
       case "payment":
         console.log('Rendering PaymentPage with selectedTemplate:', selectedTemplate, 'selectedPlan:', selectedPlan);
         return <PaymentPage selectedTemplate={selectedTemplate} selectedPlan={selectedPlan} onNavigate={handleNavigate} />;

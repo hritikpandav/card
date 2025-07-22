@@ -30,7 +30,7 @@ interface CardStats {
   // totalScans: number; // Remove totalScans
 }
 
-const Dashboard = ({ onNavigate }: { onNavigate: (section: string) => void }) => {
+const Dashboard = ({ onNavigate }: { onNavigate: (section: string, data?: any) => void }) => {
   const { user } = useAuth();
   const { subscription, getSubscriptionStatus } = useSubscription();
   const [cards, setCards] = useState<DigitalCard[]>([]);
@@ -382,53 +382,53 @@ const Dashboard = ({ onNavigate }: { onNavigate: (section: string) => void }) =>
                     <div className="text-base text-slate-600">Views</div>
                   </div>
                   <div className="flex flex-row gap-2 mt-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="flex-1 font-medium px-1 py-1 text-base rounded-xl transition-all duration-200 hover:bg-blue-100/60 hover:border-blue-400"
-                      onClick={() => onNavigate("builder")}
-                    >
-                      <Edit className="h-4 w-4 mr-1" />
-                      Edit
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="flex-1 font-medium px-1 py-1 text-base rounded-xl transition-all duration-200 hover:bg-blue-100/60 hover:border-blue-400"
-                      onClick={() => handleGenerateQR(card)}
-                    >
-                      <QrCode className="h-4 w-4" />
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      className="flex-1 font-medium px-1 py-1 text-base rounded-xl transition-all duration-200 hover:bg-blue-100/60 hover:border-blue-400"
-                      onClick={() => handleShareCard(card)}
-                    >
-                      <Share2 className="h-4 w-4" />
-                    </Button>
-                    <Button 
-                      onClick={() => toggleCardLive(card.id)}
-                      className={`flex-1 font-medium px-1 py-1 text-base rounded-xl transition-all duration-200 hover:bg-blue-100/60 hover:border-blue-400 ${
-                        card.is_public 
-                          ? "bg-red-500 hover:bg-red-600 text-white" 
-                          : "bg-green-500 hover:bg-green-600 text-white"
-                      }`}
-                      size="sm"
-                    >
-                      <Globe className="h-4 w-4 mr-2" />
-                      {card.is_public ? "Take Offline" : "Make Live"}
-                    </Button>    
-                    {card.is_public && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="flex-1 font-medium px-1 py-1 text-base rounded-xl transition-all duration-200 hover:bg-blue-100/60 hover:border-blue-400"
-                        onClick={() => window.open(`/card/${card.slug}`, '_blank', 'noopener,noreferrer')}
-                      >
-                        View
-                      </Button>
-                    )}
+<Button 
+  variant="outline" 
+  size="sm" 
+  className="flex-1 font-medium px-1 py-1 text-sm rounded-xl transition-all duration-200 hover:bg-blue-100/60 hover:border-blue-400"
+  onClick={() => onNavigate("builder", { selectedCard: card })}
+>
+  <Edit className="h-4 w-4 mr-1" />
+  Edit
+</Button>
+<Button 
+  variant="outline" 
+  size="sm" 
+  className="flex-1 font-medium px-1 py-1 text-sm rounded-xl transition-all duration-200 hover:bg-blue-100/60 hover:border-blue-400"
+  onClick={() => handleGenerateQR(card)}
+>
+  <QrCode className="h-4 w-4" />
+</Button>
+<Button 
+  variant="outline" 
+  size="sm"
+  className="flex-1 font-medium px-1 py-1 text-sm rounded-xl transition-all duration-200 hover:bg-blue-100/60 hover:border-blue-400"
+  onClick={() => handleShareCard(card)}
+>
+  <Share2 className="h-4 w-4" />
+</Button>
+<Button 
+  onClick={() => toggleCardLive(card.id)}
+  className={`flex-1 font-medium px-1 py-1 text-sm rounded-xl transition-all duration-200 hover:bg-blue-100/60 hover:border-blue-400 ${
+    card.is_public 
+      ? "bg-red-500 hover:bg-red-600 text-white" 
+      : "bg-green-500 hover:bg-green-600 text-white"
+  }`}
+  size="sm"
+>
+  <Globe className="h-4 w-4 mr-2" />
+  {card.is_public ? "Take Offline" : "Make Live"}
+</Button>    
+{card.is_public && (
+  <Button
+    variant="outline"
+    size="sm"
+    className="flex-1 font-medium px-1 py-1 text-sm rounded-xl transition-all duration-200 hover:bg-blue-100/60 hover:border-blue-400"
+    onClick={() => window.open(`/card/${card.slug}`, '_blank', 'noopener,noreferrer')}
+  >
+    View
+  </Button>
+)}
                   </div>
                   <p className="text-[13px] text-slate-500 text-center mt-1">
                     Updated {new Date(card.updated_at).toLocaleDateString()}

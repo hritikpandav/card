@@ -14,37 +14,67 @@ import { useIsMobile } from "@/hooks/use-mobile";
 interface CardBuilderProps {
   selectedTemplate: any;
   selectedPlan?: any;
+  selectedCard?: any;
   onNavigate: (section: string) => void;
 }
 
-const CardBuilder = ({ selectedTemplate, selectedPlan, onNavigate }: CardBuilderProps) => {
+const CardBuilder = ({ selectedTemplate, selectedPlan, selectedCard, onNavigate }: CardBuilderProps) => {
   const { user } = useAuth();
   const isMobile = useIsMobile();
   const [activeTab, setActiveTab] = useState("content");
   const [saving, setSaving] = useState(false);
-  const [cardData, setCardData] = useState({
-    name: "John Doe",
-    title: "Marketing Manager", 
-    company: "TechCorp Inc.",
-    email: "john.doe@techcorp.com",
-    phone: "+1 (555) 123-4567",
-    website: "www.johndoe.com",
-    bio: "Passionate marketing professional with 8+ years of experience in digital marketing and brand strategy.",
-    profileImage: null as string | null,
-    social: {
-      linkedin: "https://linkedin.com/in/johndoe",
-      twitter: "https://twitter.com/johndoe",
-      instagram: "https://instagram.com/johndoe",
-      facebook: "https://facebook.com/johndoe",
-      youtube: "https://youtube.com/@johndoe"
-    },
-    colors: {
-      primary: selectedTemplate?.colors?.[0] || "#1E40AF",
-      secondary: selectedTemplate?.colors?.[1] || "#3B82F6", 
-      accent: selectedTemplate?.colors?.[2] || "#EF4444",
-      background: selectedTemplate?.colors?.[3] || "#FFFFFF"
-    },
-    template: selectedTemplate?.id || "professional-navy"
+  const [cardData, setCardData] = useState(() => {
+    if (selectedCard) {
+      return {
+        name: selectedCard.name || "John Doe",
+        title: selectedCard.title || "Marketing Manager",
+        company: selectedCard.company || "TechCorp Inc.",
+        email: selectedCard.email || "",
+        phone: selectedCard.phone || "",
+        website: selectedCard.website || "",
+        bio: selectedCard.bio || "",
+        profileImage: selectedCard.profile_image || null,
+        social: selectedCard.social || {
+          linkedin: "",
+          twitter: "",
+          instagram: "",
+          facebook: "",
+          youtube: ""
+        },
+        colors: selectedCard.colors || {
+          primary: selectedTemplate?.colors?.[0] || "#1E40AF",
+          secondary: selectedTemplate?.colors?.[1] || "#3B82F6",
+          accent: selectedTemplate?.colors?.[2] || "#EF4444",
+          background: selectedTemplate?.colors?.[3] || "#FFFFFF"
+        },
+        template: selectedCard.template || selectedTemplate?.id || "professional-navy"
+      };
+    } else {
+      return {
+        name: "John Doe",
+        title: "Marketing Manager", 
+        company: "TechCorp Inc.",
+        email: "john.doe@techcorp.com",
+        phone: "+1 (555) 123-4567",
+        website: "www.johndoe.com",
+        bio: "Passionate marketing professional with 8+ years of experience in digital marketing and brand strategy.",
+        profileImage: null as string | null,
+        social: {
+          linkedin: "https://linkedin.com/in/johndoe",
+          twitter: "https://twitter.com/johndoe",
+          instagram: "https://instagram.com/johndoe",
+          facebook: "https://facebook.com/johndoe",
+          youtube: "https://youtube.com/@johndoe"
+        },
+        colors: {
+          primary: selectedTemplate?.colors?.[0] || "#1E40AF",
+          secondary: selectedTemplate?.colors?.[1] || "#3B82F6", 
+          accent: selectedTemplate?.colors?.[2] || "#EF4444",
+          background: selectedTemplate?.colors?.[3] || "#FFFFFF"
+        },
+        template: selectedTemplate?.id || "professional-navy"
+      };
+    }
   });
 
   const [showQRCode, setShowQRCode] = useState(false);
@@ -104,42 +134,67 @@ const CardBuilder = ({ selectedTemplate, selectedPlan, onNavigate }: CardBuilder
     }
 
     setSaving(true);
-    
+
     try {
       console.log('Saving card with data:', cardData);
-      
-      // Generate a unique slug
-      const { data: slugData, error: slugError } = await supabase
-        .rpc('generate_card_slug', { input_name: cardData.name });
 
-      if (slugError) {
-        console.error('Error generating slug:', slugError);
-        throw slugError;
+      let slugData = null;
+      if (!selectedCard) {
+        // Generate a unique slug only for new cards
+        const { data: slugResponse, error: slugError } = await supabase
+          .rpc('generate_card_slug', { input_name: cardData.name });
+
+        if (slugError) {
+          console.error('Error generating slug:', slugError);
+          throw slugError;
+        }
+        slugData = slugResponse;
       }
 
-      console.log('Generated slug:', slugData);
-
-      // Save the card to database
-      const { data, error } = await supabase
-        .from('digital_cards')
-        .insert({
-          user_id: user.id,
-          name: cardData.name,
-          title: cardData.title,
-          company: cardData.company,
-          email: cardData.email,
-          phone: cardData.phone,
-          website: cardData.website,
-          bio: cardData.bio,
-          social: cardData.social,
-          colors: cardData.colors,
-          template: cardData.template,
-          slug: slugData,
-          is_public: true,
-          profile_image: cardData.profileImage
-        })
-        .select()
-        .single();
+      let data, error;
+      if (selectedCard && selectedCard.id) {
+        // Update existing card
+        ({ data, error } = await supabase
+          .from('digital_cards')
+          .update({
+            name: cardData.name,
+            title: cardData.title,
+            company: cardData.company,
+            email: cardData.email,
+            phone: cardData.phone,
+            website: cardData.website,
+            bio: cardData.bio,
+            social: cardData.social,
+            colors: cardData.colors,
+            template: cardData.template,
+            profile_image: cardData.profileImage
+          })
+          .eq('id', selectedCard.id)
+          .select()
+          .single());
+      } else {
+        // Insert new card
+        ({ data, error } = await supabase
+          .from('digital_cards')
+          .insert({
+            user_id: user.id,
+            name: cardData.name,
+            title: cardData.title,
+            company: cardData.company,
+            email: cardData.email,
+            phone: cardData.phone,
+            website: cardData.website,
+            bio: cardData.bio,
+            social: cardData.social,
+            colors: cardData.colors,
+            template: cardData.template,
+            slug: slugData,
+            is_public: true,
+            profile_image: cardData.profileImage
+          })
+          .select()
+          .single());
+      }
 
       if (error) {
         console.error('Error saving card:', error);
@@ -148,8 +203,8 @@ const CardBuilder = ({ selectedTemplate, selectedPlan, onNavigate }: CardBuilder
 
       console.log('Card saved successfully:', data);
       setSavedCardSlug(data.slug);
-      toast.success("Card saved successfully!", {
-        description: "Your digital card is now live and can be shared with others."
+      toast.success(selectedCard ? "Card updated successfully!" : "Card saved successfully!", {
+        description: selectedCard ? "Your digital card has been updated." : "Your digital card is now live and can be shared with others."
       });
     } catch (error) {
       console.error('Error saving card:', error);
