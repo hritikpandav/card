@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Eye } from "lucide-react";
@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useSubscription } from "@/hooks/useSubscription";
 
 interface CardBuilderProps {
   selectedTemplate: any;
@@ -21,6 +22,7 @@ interface CardBuilderProps {
 const CardBuilder = ({ selectedTemplate, selectedPlan, selectedCard, onNavigate }: CardBuilderProps) => {
   const { user } = useAuth();
   const isMobile = useIsMobile();
+  const { getSubscriptionStatus } = useSubscription();
   const [activeTab, setActiveTab] = useState("content");
   const [saving, setSaving] = useState(false);
   const [cardData, setCardData] = useState(() => {
@@ -79,6 +81,20 @@ const CardBuilder = ({ selectedTemplate, selectedPlan, selectedCard, onNavigate 
 
   const [showQRCode, setShowQRCode] = useState(false);
   const [savedCardSlug, setSavedCardSlug] = useState<string | null>(null);
+  const [userCardsCount, setUserCardsCount] = useState<number | null>(null);
+
+  // Fetch user's card count on mount
+  useEffect(() => {
+    const fetchCardCount = async () => {
+      if (!user) return;
+      const { count, error } = await supabase
+        .from('digital_cards')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id);
+      if (!error) setUserCardsCount(count ?? 0);
+    };
+    if (!selectedCard) fetchCardCount();
+  }, [user, selectedCard]);
 
   const handleInputChange = (field: string, value: string) => {
     if (field.includes('.')) {
@@ -130,6 +146,15 @@ const CardBuilder = ({ selectedTemplate, selectedPlan, selectedCard, onNavigate 
   const handleSave = async () => {
     if (!user) {
       toast.error("Please sign in to save your card");
+      return;
+    }
+
+    // Enforce free trial card limit
+    const subscriptionStatus = getSubscriptionStatus();
+    const isTrial = subscriptionStatus.status === 'trial';
+    const trialCardLimit = 1;
+    if (!selectedCard && isTrial && userCardsCount !== null && userCardsCount >= trialCardLimit) {
+      toast.error("Free trial users can only create one card. Upgrade to add more.");
       return;
     }
 
