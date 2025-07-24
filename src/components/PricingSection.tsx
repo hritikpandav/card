@@ -123,7 +123,7 @@ const PricingSection = ({ selectedTemplate, onPlanSelect }: PricingSectionProps)
   };
 
   const formatPrice = (priceCents: number) => {
-    return `$${(priceCents / 100).toFixed(0)}`;
+    return `₹${(priceCents / 100).toFixed(0)}`;
   };
 
   const getPlanFeatures = (duration: number) => {
@@ -215,7 +215,7 @@ const PricingSection = ({ selectedTemplate, onPlanSelect }: PricingSectionProps)
               </div>
               <CardTitle className="text-xl font-bold text-slate-900">Free Trial</CardTitle>
               <div className="text-center">
-                <span className="text-3xl font-bold text-slate-900">$0</span>
+                <span className="text-3xl font-bold text-slate-900">₹0</span>
                 <span className="text-slate-600">/7 days</span>
               </div>
               <p className="text-sm text-slate-600">Perfect for getting started</p>
