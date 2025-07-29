@@ -82,8 +82,7 @@ const PaymentPage = ({ selectedTemplate, selectedPlan, onNavigate }: PaymentPage
           success: true,
           transactionId: `txn_${Date.now()}`,
           amount: selectedPlan && selectedPlan.price ? selectedPlan.price : 0,
-          currency: 'Rupee'
-          
+          currency: 'USD'
         };
 
       console.log('simulatePayment - user:', user);
@@ -231,7 +230,7 @@ const PaymentPage = ({ selectedTemplate, selectedPlan, onNavigate }: PaymentPage
                 </button>
               </div>
               <p className="text-lg font-semibold text-gray-800 mb-2">
-                {selectedPlan?.name} - <span className="text-blue-600">₹{selectedPlan?.price ? selectedPlan.price.toFixed(2) : '0.00'}</span>
+                {selectedPlan?.name} - <span className="text-blue-600">${selectedPlan?.price ? selectedPlan.price.toFixed(2) : '0.00'}</span>
               </p>
               <p className="text-sm text-gray-600 mb-3">Duration: {selectedPlan?.duration} month{selectedPlan?.duration > 1 ? 's' : ''}</p>
               <div>
@@ -326,7 +325,7 @@ const PaymentPage = ({ selectedTemplate, selectedPlan, onNavigate }: PaymentPage
                   <div className="flex justify-between items-center mb-4">
                     <span className="font-semibold">Total:</span>
                     <span className="text-2xl font-bold text-blue-600">
-                      {selectedPlan && selectedPlan.price ? `₹${selectedPlan.price}` : '₹0'}
+                      {selectedPlan && selectedPlan.price ? `$${selectedPlan.price}` : '$0'}
                     </span>
                    </div>
                   
@@ -343,7 +342,7 @@ const PaymentPage = ({ selectedTemplate, selectedPlan, onNavigate }: PaymentPage
                     ) : (
                       <div className="flex items-center space-x-2">
                         <Lock className="h-4 w-4" />
-                        <span>Pay ₹{selectedPlan && selectedPlan.price ? selectedPlan.price : 0}</span>
+                        <span>Pay ${selectedPlan && selectedPlan.price ? selectedPlan.price : 0}</span>
                       </div>
                     )}
                   </Button>
