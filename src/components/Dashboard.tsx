@@ -124,6 +124,7 @@ const Dashboard = ({ onNavigate }: { onNavigate: (section: string, data?: any) =
     }
   };
 
+
   // Helper function to copy text to clipboard with fallback
   const copyToClipboard = (text: string): Promise<void> => {
     if (navigator.clipboard) {
@@ -175,9 +176,6 @@ const Dashboard = ({ onNavigate }: { onNavigate: (section: string, data?: any) =
 
   const subscriptionStatus = getSubscriptionStatus();
   const liveCards = cards.filter(card => card.is_public).length;
-  const isTrial = subscriptionStatus.status === 'trial';
-  const trialCardLimit = 1; // Only 1 card allowed in trial
-  const trialCardLimitReached = isTrial && cards.length >= trialCardLimit;
 
   if (loading) {
     return (
@@ -202,8 +200,6 @@ const Dashboard = ({ onNavigate }: { onNavigate: (section: string, data?: any) =
           <Button 
             onClick={() => onNavigate("templates")}
             className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white mt-4 md:mt-0"
-            disabled={trialCardLimitReached}
-            title={trialCardLimitReached ? 'Free trial users can only create one card.' : ''}
           >
             <Plus className="h-4 w-4 mr-2" />
             Create New Card
@@ -316,15 +312,10 @@ const Dashboard = ({ onNavigate }: { onNavigate: (section: string, data?: any) =
             <Button 
               onClick={() => onNavigate("templates")}
               className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg"
-              disabled={trialCardLimitReached}
-              title={trialCardLimitReached ? 'Free trial users can only create one card.' : ''}
             >
               <Plus className="h-4 w-4 mr-2" />
               Create Your First Card
             </Button>
-            {trialCardLimitReached && (
-              <div className="mt-4 text-red-600 font-medium">Free trial users can only create one card. Upgrade to add more.</div>
-            )}
           </div>
         ) : (
           <div
